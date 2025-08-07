@@ -82,7 +82,19 @@ class Museo:
             print("Caracter inválido. Debe ser un numero entre 1 y 225.")
 
     def buscar_por_nombre_autor(self):
-        pass
+        nombre_autor = input("Ingrese el nombre del autor: ")
+        if nombre_autor:
+            response = requests.get(self.api + f"search?q={nombre_autor}")
+            data = response.json()
+                
+            if data["total"]==0:
+                print(f"No se encontraron obras del autor {nombre_autor}.")
+                return
+                    
+            self.mostrar_obras(data["objectIDs"])
+            
+        else:
+            print("Error: Debe ingresar un nombre válido.")
 
     def load_departamentos(self):
         dept_response = requests.get(self.api + "departments")
