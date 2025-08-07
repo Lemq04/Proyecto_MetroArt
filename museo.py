@@ -33,11 +33,34 @@ class Museo:
                 print("Opción no válida. Por favor, seleccione una opción del 1 al 4.")
 
     def buscar_por_departamento(self):
-        pass
+        self.load_departamentos()
+        for dept in self.departmentos:
+            dept.show()
+            print()
+        dept_id = input("Indique el id del departamento: ")
+        if dept_id.isdigit():
+            response = requests.get(self.api + f"search?q=&departmentId={dept_id}")
+            data = response.json()  
+            if data["total"]==0:
+                print("No se encontraron obras para este departamento.")
+                return       
+            self.mostar_obras(data["objectIDs"])
+        else:
+            print("Error: Debe ingresar un número.")
+            return
     
     def buscar_por_nacionalidad(self):
         pass
     
     def buscar_por_nombre_autor(self):
+        pass
+
+    def load_departamentos(self):
+        dept_response = requests.get(self.api + "departments")
+        dept_data = dept_response.json()
+        for dept in dept_data['departments']:
+            self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
+
+    def mostrar_obras(self, obras_id):
         pass
         
