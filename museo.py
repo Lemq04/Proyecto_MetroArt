@@ -15,7 +15,6 @@ class Museo:
    
     def menu(self):
         while True:
-            print("v1.4.5")
             print("\n---- Menú Principal del Catálogo de Arte ----\n1.- Buscar obras por Departamento\n2.- Buscar obras por Nacionalidad del Autor\n3.- Buscar obras por Nombre del Autor\n4.- Salir")
 
             opcion = input("Ingrese su opción: ")
@@ -44,14 +43,44 @@ class Museo:
             if data["total"]==0:
                 print("No se encontraron obras para este departamento.")
                 return       
-            self.mostar_obras(data["objectIDs"])
+            self.mostrar_obras(data["objectIDs"])
         else:
             print("Error: Debe ingresar un número.")
             return
     
     def buscar_por_nacionalidad(self):
-        pass
-    
+        self.load_nacionalidades()
+        print("\n---- Nacionalidades ----")
+        for i, nacionalidad in enumerate(self.nacionalidades[0:225], 1):
+            print(f"{i}. {nacionalidad}")
+        print("Mostrando 225 nacionalidades")
+        
+        nacionalidad_input = input("\nIngrese el número de la nacionalidad: ")
+        
+        if nacionalidad_input.isdigit():
+            num = int(nacionalidad_input)
+            if 1 <= num <= 225:
+                nacionalidad_seleccionada = self.nacionalidades[num-1]
+                print(f"Nacionalidad seleccionada: {nacionalidad_seleccionada}")
+                
+                    
+                response = requests.get(self.api + f"search?artistOrCulture=true&q={nacionalidad_seleccionada}")
+                response.raise_for_status()  
+                data = response.json()
+                    
+                if data["total"]==0:
+                    print(f"No se encontraron obras de artistas de nacionalidad {nacionalidad_seleccionada} en la colección del museo.")
+                    return
+                    
+                print(f"¡Excelente! Encontradas {data["total"]} obras de artistas {nacionalidad_seleccionada}.")
+                self.mostrar_obras(data["objectIDs"])
+                    
+
+            else:
+                print("Número inválido. Debe estar entre 1 y 225.")
+        else:
+            print("Caracter inválido. Debe ser un numero entre 1 y 225.")
+
     def buscar_por_nombre_autor(self):
         pass
 
@@ -60,6 +89,11 @@ class Museo:
         dept_data = dept_response.json()
         for dept in dept_data['departments']:
             self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
+
+    def load_nacionalidades(self):
+        with open("nacionalidades.txt", "r") as nacionalidades:
+            for nacionalidad in nacionalidades:
+                    self.nacionalidades.append(nacionalidad)
 
     def mostrar_obras(self, obras_id):
         pass
