@@ -49,6 +49,11 @@ class Obra:
                 img.show()
             else:
                 print("La obra no tiene imagen")
+    
+        elif opcion=="2":
+            pass
+        else:
+            print("Opcion no valida")
       
     def guardar_imagen_desde_url(self):
         """Guarda la Ruta o URL de la imagen asociada a la obra

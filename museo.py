@@ -32,7 +32,7 @@ class Museo:
             elif opcion == "3":
                 self.buscar_por_nombre_autor()
             elif opcion == "4":
-                print("¡Gracias por visitar el catálogo del Museo Metropolitano de Arte!")
+                print("¡Gracias por visitar el catálogo del Museo metropolitano de Arte!")
                 break
             else:
                 print("Opción no válida. Por favor, seleccione una opción del 1 al 4.")
@@ -52,14 +52,13 @@ class Museo:
             response = requests.get(self.api + f"search?q=&departmentId={dept_id}")
             data = response.json()  
             if data["total"]==0:
-                print("No se encontraron obras para este departamento.")
-                return      
-             
+                print("No se encontraron obras para este departamento.")  
+                return 
+            
             print(f"Encontradas {data["total"]} obras.")
             self.mostrar_obras(data["objectIDs"])
         else:
             print("Error: Debe ingresar un número.")
-            return
     
     def buscar_por_nacionalidad(self):
         """Busca y muestra obras de arte por nacionalidad del autor.
@@ -79,15 +78,14 @@ class Museo:
             if 1 <= num <= 225:
                 nacionalidad_seleccionada = self.nacionalidades[num-1]
                 print(f"Nacionalidad seleccionada: {nacionalidad_seleccionada}")
-                    
-                response = requests.get(self.api + f"search?artistOrCulture=true&q={nacionalidad_seleccionada}")
-                response.raise_for_status()  
+                
+                response = requests.get(self.api + f"search?artistOrCulture=true&q={nacionalidad_seleccionada}") 
                 data = response.json()
                     
                 if data["total"]==0:
-                    print(f"No se encontraron obras de artistas de nacionalidad {nacionalidad_seleccionada} en la colección del museo.")
+                    print(f"No se encontraron obras de artistas de nacionalidad {nacionalidad_seleccionada}.")
                     return
-                    
+                
                 print(f"Encontradas {data["total"]} obras.")
                 self.mostrar_obras(data["objectIDs"])
                     
@@ -103,13 +101,13 @@ class Museo:
         a ese autor en la colección del museo.
         """
         nombre_autor = input("Ingrese el nombre del autor: ")
-        if nombre_autor:
+        if nombre_autor!="":
             response = requests.get(self.api + f"search?q={nombre_autor}")
             data = response.json()
                 
             if data["total"]==0:
                 print(f"No se encontraron obras del autor {nombre_autor}.")
-                return
+                return 
             
             print(f"Encontradas {data["total"]} obras.")        
             self.mostrar_obras(data["objectIDs"])
@@ -123,10 +121,15 @@ class Museo:
         Los departamentos se almacenan como objetos Departamento en la lista departmentos.
         """  
         self.departmentos = []
+        
         dept_response = requests.get(self.api + "departments")
-        dept_data = dept_response.json()
-        for dept in dept_data['departments']:
-            self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
+        if dept_response.status_code==200:
+            dept_data = dept_response.json()
+            for dept in dept_data['departments']:
+                self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
+        else:
+            print("Error al imprimir departamentos")
+            return
 
     def load_nacionalidades(self):
         """Carga la lista de nacionalidades desde un archivo de texto.
@@ -181,8 +184,10 @@ class Museo:
                         opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
                         if opcion=="1":
                             print("cargando...")
-                        else:
+                        elif opcion=="2":
                             break
+                        else:
+                            print("Opcion no valida")
             
             if v==len(obras_ids):
                 for autor in self.obra[a:i]:
@@ -195,6 +200,11 @@ class Museo:
             opcion=input("ID de la obra:\n")
             print()
             self.ofrecer_detalles_obra(int(opcion))
+        elif detalle=="2":
+            pass
+        else:
+            print("Opcion no valida")
+            
 
     def ofrecer_detalles_obra(self,opcion):
         """Ofrece detalles adicionales de la obra seleccionada.
