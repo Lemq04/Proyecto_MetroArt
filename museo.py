@@ -107,6 +107,29 @@ class Museo:
             for nacionalidad in nacionalidades:
                     self.nacionalidades.append(nacionalidad)
 
-    def mostrar_obras(self, obras_id):
-        pass
+    def mostrar_obras(self, obras_ids):
+        self.autor=[]
+        self.obra=[]
+        i=0
+        print()
+        for obra in obras_ids:
+          
+           response=requests.get(self.api+f"objects/{obra}")
+           data=response.json()
+           i+=1
+           self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
+           autor_obra=[]
+           for autor in self.autor:
+               autor_obra.append(autor)
+
+           self.obra.append(Obra(data["objectID"],data["title"],autor,data["classification"],data["objectDate"],data["primaryImage"]))
+           if i%10==0:
+               for autor in self.obra:
+                   autor.show() 
+                   print()
+           opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
+           if opcion=="1":
+               pass
+           else:
+               break
         
