@@ -111,25 +111,44 @@ class Museo:
         self.autor=[]
         self.obra=[]
         i=0
-        print()
+        v=0
+        print(obras_ids)
         for obra in obras_ids:
+            print("1")
           
-           response=requests.get(self.api+f"objects/{obra}")
-           data=response.json()
-           i+=1
-           self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
-           autor_obra=[]
-           for autor in self.autor:
-               autor_obra.append(autor)
+            response=requests.get(self.api+f"objects/{obra}")
+            data=response.json()
+            v+=1
+      
+            if "objectID" not in data:
+                pass
+            else:
+                i+=1
+                self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
+                autor_obra=[]
+                for autor in self.autor:
+                    autor_obra.append(autor)
 
-           self.obra.append(Obra(data["objectID"],data["title"],autor,data["classification"],data["objectDate"],data["primaryImage"]))
-           if i%10==0:
-               for autor in self.obra:
-                   autor.show() 
-                   print()
-           opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
-           if opcion=="1":
-               pass
-           else:
-               break
-        
+                self.obra.append(Obra(data["objectID"],data["title"],autor,data["classification"],data["objectDate"],data["primaryImage"]))
+                if v!=len(obras_ids):
+                    if i%10==0:
+                        for autor in self.obra:
+                            autor.show() 
+                            print()
+                    opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
+                    if opcion=="1":
+                        pass
+                    else:
+                        break
+                else:
+                   break
+
+        detalle=input("Desea ver mas detalles;\n1.--Si\n2.-No\n")
+        if detalle == "1":
+            self.ofrecer_detalles_obra()
+
+    def ofrecer_detalles_obra(self):
+        pass
+
+
+            
