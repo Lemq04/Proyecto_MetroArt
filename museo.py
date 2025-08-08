@@ -5,8 +5,18 @@ from autor import Autor
 from obra import Obra
 
 class Museo:
+    """Clase principal que representa el catálogo del Museo Metropolitano de Arte.
+    
+    Esta clase permite interactuar con la API del museo para buscar y mostrar
+    información al usuario sobre departamentos, obras de arte y autores.
+    """
     
     def __init__(self,api):
+        """Se inicializa con la api del museo y se inicializan las listas globales (self) dentro de la clase Museo
+        
+        Args:
+            api (str): URL base de la API del museo.
+        """
         self.api=api
    
     def menu(self):
@@ -28,6 +38,11 @@ class Museo:
                 print("Opción no válida. Por favor, seleccione una opción del 1 al 4.")
 
     def buscar_por_departamento(self):
+        """Busca y muestra obras de arte por departamento del museo.
+        
+        Carga la lista de departamentos disponibles, permite al usuario seleccionar uno
+        y muestra las obras asociadas a ese departamento.
+        """
         self.load_departamentos()
         for dept in self.departmentos:
             dept.show()
@@ -47,6 +62,11 @@ class Museo:
             return
     
     def buscar_por_nacionalidad(self):
+        """Busca y muestra obras de arte por nacionalidad del autor.
+        
+        Carga la lista de nacionalidades disponibles, permite al usuario seleccionar una
+        y muestra las obras creadas por autores de esa nacionalidad.
+        """
         self.load_nacionalidades()
         print("\n---- Nacionalidades ----")
         for i, nacionalidad in enumerate(self.nacionalidades[0:225], 1):
@@ -77,6 +97,11 @@ class Museo:
             print("Caracter inválido. Debe ser un numero entre 1 y 225.")
 
     def buscar_por_nombre_autor(self):
+        """Busca y muestra obras de arte por nombre del autor.
+        
+        Solicita al usuario un nombre de autor y muestra las obras asociadas
+        a ese autor en la colección del museo.
+        """
         nombre_autor = input("Ingrese el nombre del autor: ")
         if nombre_autor:
             response = requests.get(self.api + f"search?q={nombre_autor}")
@@ -93,6 +118,10 @@ class Museo:
             print("Error: Debe ingresar un nombre válido.")
 
     def load_departamentos(self):
+        """Carga la lista de departamentos disponibles desde la API del museo.
+        
+        Los departamentos se almacenan como objetos Departamento en la lista departmentos.
+        """  
         self.departmentos = []
         dept_response = requests.get(self.api + "departments")
         dept_data = dept_response.json()
@@ -100,12 +129,25 @@ class Museo:
             self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
 
     def load_nacionalidades(self):
+        """Carga la lista de nacionalidades desde un archivo de texto.
+        
+        Las nacionalidades se leen del archivo 'nacionalidades.txt' y se almacenan
+        en la lista nacionalidades.
+        """
         self.nacionalidades = []
         with open("nacionalidades.txt", "r") as nacionalidades:
             for nacionalidad in nacionalidades:
                     self.nacionalidades.append(nacionalidad)
 
     def mostrar_obras(self, obras_ids):
+        """Muestra las obras de correspondientes a los IDs proporcionados.
+        
+        Args:
+            obras_ids (list): Lista de IDs de las obras a mostrar.
+            
+        Muestra las obras en grupos de 10, permitiendo al usuario decidir si desea
+        ver más obras o detener la visualización.
+        """ 
         self.autor=[]
         self.obra=[]
         i=0
@@ -155,6 +197,11 @@ class Museo:
             self.ofrecer_detalles_obra(int(opcion))
 
     def ofrecer_detalles_obra(self,opcion):
+        """Ofrece detalles adicionales de la obra seleccionada.
+        
+        Args:
+            opcion (list): Lista de obras a las que se les ofrece mostrar los detalles.
+        """
         for obra in self.obra:
             if obra.id_obra==opcion:
                 obra.show_detalle()

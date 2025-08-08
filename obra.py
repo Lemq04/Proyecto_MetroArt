@@ -3,6 +3,16 @@ from PIL import Image
 
 class Obra:
     def __init__(self, id_obra, titulo, autor_obra, tipo, anio_creacion,imagen):
+        """Inicializa las variables de la clase Obra.
+
+        Args:
+            id_obra (int): Identificacion de la obra
+            titulo (str): Titulo de la obra
+            autor_obra (Autor): Objeto Autor de la obra asociada 
+            tipo (str): Tipo de obra(pintura, escultura, etc.)
+            anio_creacion (str): Año de creacion de la obra 
+            imagen (str): URL de la imagen de la obra 
+        """
         self.id_obra = id_obra
         self.titulo = titulo
         self.autor_obra = autor_obra  
@@ -12,12 +22,16 @@ class Obra:
         self.imagen=imagen
 
     def show(self):
+        """Despliega la informacion basica de la obra(ID, titulo y nombre del autor) 
+        """
         print(f"ID de Obra: {self.id_obra}")
         print(f"Título: {self.titulo}")
         print(f"Autor: {self.autor_obra.nombre_autor}")
         
 
     def show_detalle(self):
+        """Muestra informacion detallada de la obra y la imagen.
+        """
         print(f"\n--- Detalles de la Obra ---")
         print(f"Título: {self.titulo}")
         print(f"Nombre del Artista: {self.autor_obra.nombre_autor}")
@@ -37,6 +51,11 @@ class Obra:
                 print("La obra no tiene imagen")
       
     def guardar_imagen_desde_url(self):
+        """Guarda la Ruta o URL de la imagen asociada a la obra
+
+        Returns:
+            _str: Nombre del archivo de la imagen guardada
+        """
         
         try:
             response = requests.get(self.imagen, stream=True)
@@ -58,11 +77,11 @@ class Obra:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         file.write(chunk)
-            print(f"Imagen guardada exitosamente como '{nombre_archivo_final}'")
+            print(f"Imagen guardada '{nombre_archivo_final}'")
 
 
         except requests.exceptions.RequestException as e:
-            print(f"Error al hacer el request: {e}")
+            print(f"Error: {e}")
         except IOError as e:
-            print(f"Error al escribir el archivo: {e}")
+            print(f"Error: {e}")
         return nombre_archivo_final
