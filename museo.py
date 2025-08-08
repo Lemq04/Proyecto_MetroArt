@@ -8,10 +8,6 @@ class Museo:
     
     def __init__(self,api):
         self.api=api
-        self.departmentos = []
-        self.obras=[]
-        self.autores=[]
-        self.nacionalidades = []
    
     def menu(self):
         while True:
@@ -42,7 +38,9 @@ class Museo:
             data = response.json()  
             if data["total"]==0:
                 print("No se encontraron obras para este departamento.")
-                return       
+                return      
+             
+            print(f"Encontradas {data["total"]} obras.")
             self.mostrar_obras(data["objectIDs"])
         else:
             print("Error: Debe ingresar un número.")
@@ -53,7 +51,6 @@ class Museo:
         print("\n---- Nacionalidades ----")
         for i, nacionalidad in enumerate(self.nacionalidades[0:225], 1):
             print(f"{i}. {nacionalidad}")
-        print("Mostrando 225 nacionalidades")
         
         nacionalidad_input = input("\nIngrese el número de la nacionalidad: ")
         
@@ -62,7 +59,6 @@ class Museo:
             if 1 <= num <= 225:
                 nacionalidad_seleccionada = self.nacionalidades[num-1]
                 print(f"Nacionalidad seleccionada: {nacionalidad_seleccionada}")
-                
                     
                 response = requests.get(self.api + f"search?artistOrCulture=true&q={nacionalidad_seleccionada}")
                 response.raise_for_status()  
@@ -72,10 +68,9 @@ class Museo:
                     print(f"No se encontraron obras de artistas de nacionalidad {nacionalidad_seleccionada} en la colección del museo.")
                     return
                     
-                print(f"¡Excelente! Encontradas {data["total"]} obras de artistas {nacionalidad_seleccionada}.")
+                print(f"Encontradas {data["total"]} obras.")
                 self.mostrar_obras(data["objectIDs"])
                     
-
             else:
                 print("Número inválido. Debe estar entre 1 y 225.")
         else:
@@ -90,19 +85,22 @@ class Museo:
             if data["total"]==0:
                 print(f"No se encontraron obras del autor {nombre_autor}.")
                 return
-                    
+            
+            print(f"Encontradas {data["total"]} obras.")        
             self.mostrar_obras(data["objectIDs"])
             
         else:
             print("Error: Debe ingresar un nombre válido.")
 
     def load_departamentos(self):
+        self.departmentos = []
         dept_response = requests.get(self.api + "departments")
         dept_data = dept_response.json()
         for dept in dept_data['departments']:
             self.departmentos.append(Departamento(dept['departmentId'], dept['displayName']))
 
     def load_nacionalidades(self):
+        self.nacionalidades = []
         with open("nacionalidades.txt", "r") as nacionalidades:
             for nacionalidad in nacionalidades:
                     self.nacionalidades.append(nacionalidad)
@@ -112,41 +110,54 @@ class Museo:
         self.obra=[]
         i=0
         v=0
+        a=0
+        print("cargando...mostrando de 10 en 10")
+        print()
         for obra in obras_ids:
             
             response=requests.get(self.api+f"objects/{obra}")
-            data=response.json()
             v+=1
-            
-            if "objectID" not in data:
-                continue
-            else:
-                i+=1
-                self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
-                autor_obra=[]
-                for autor in self.autor:
-                    autor_obra.append(autor)
-
-                self.obra.append(Obra(data["objectID"],data["title"],autor,data["classification"],data["objectDate"],data["primaryImage"]))
-                if v!=len(obras_ids):
+            if response.status_code==200:
+                data=response.json()
+                
+                if "objectID" not in data:
+                    continue
+                
+                else:
+                    i+=1
+                    self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
+                    autor_obra=[]
+                    for autor in self.autor:
+                        autor_obra.append(autor)
+                    self.obra.append(Obra(data["objectID"],data["title"],autor,data["classification"],data["objectDate"],data["primaryImage"]))
+                    
                     if i%10==0:
-                        for autor in self.obra:
+                        for autor in self.obra[a:i]:
                             autor.show() 
                             print()
+                            a=i
                         opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
                         if opcion=="1":
-                            pass
+                            print("cargando...")
                         else:
                             break
-                else:
-                    break
+            
+            if v==len(obras_ids):
+                for autor in self.obra[a:i]:
+                            autor.show() 
+                            print()
 
-        detalle=input("Desea ver mas detalles:\n1.--Si\n2.-No\n")
+
+        detalle=input("Desea ver mas detalles:\n1.-Si\n2.-No\n")
         if detalle == "1":
-            self.ofrecer_detalles_obra()
+            opcion=input("ID de la obra:\n")
+            print()
+            self.ofrecer_detalles_obra(int(opcion))
 
-    def ofrecer_detalles_obra(self):
-        pass
+    def ofrecer_detalles_obra(self,opcion):
+        for obra in self.obra:
+            if obra.id_obra==opcion:
+                obra.show_detalle()
 
 
             
