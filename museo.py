@@ -112,16 +112,14 @@ class Museo:
         self.obra=[]
         i=0
         v=0
-        print(obras_ids)
         for obra in obras_ids:
-            print("1")
-          
+            
             response=requests.get(self.api+f"objects/{obra}")
             data=response.json()
             v+=1
-      
+            
             if "objectID" not in data:
-                pass
+                continue
             else:
                 i+=1
                 self.autor.append(Autor(data["artistDisplayName"],data["artistNationality"],data["artistBeginDate"],data["artistEndDate"]))
@@ -135,15 +133,15 @@ class Museo:
                         for autor in self.obra:
                             autor.show() 
                             print()
-                    opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
-                    if opcion=="1":
-                        pass
-                    else:
-                        break
+                        opcion=input("Desea ver mas obras:\n1.-Si\n2.-No\n")
+                        if opcion=="1":
+                            pass
+                        else:
+                            break
                 else:
-                   break
+                    break
 
-        detalle=input("Desea ver mas detalles;\n1.--Si\n2.-No\n")
+        detalle=input("Desea ver mas detalles:\n1.--Si\n2.-No\n")
         if detalle == "1":
             self.ofrecer_detalles_obra()
 
